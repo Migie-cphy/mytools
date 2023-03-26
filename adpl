@@ -1,0 +1,31 @@
+#!/usr/local/Caskroom/miniconda/base/bin/python
+import sys
+import numpy as np
+import matplotlib.pyplot as plt
+import scienceplots
+
+plt.style.use(['science', 'nature'])
+
+
+data_file = sys.argv[1]
+
+data = np.loadtxt(data_file, skiprows=1)
+steps_arr = data[:, 0]
+temp_arr = data[:, 1]
+energy_arr = data[:, 2]
+steps_arr = steps_arr * 0.002
+
+fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(8, 6), dpi=300)
+axes[0].plot(steps_arr, temp_arr, color='black')
+axes[1].plot(steps_arr, energy_arr, color='blue')
+axes[0].set_ylabel("Temperature (K)", fontsize=18)
+axes[1].set_ylabel("Energy (eV)", fontsize=18)
+axes[1].set_xlabel("Time (ps)", fontsize=18)
+axes[0].set_xlim(steps_arr[0], steps_arr[-1])
+axes[1].set_xlim(steps_arr[0], steps_arr[-1])
+axes[0].tick_params(axis='x', which='both', labelbottom=False)
+axes[0].tick_params(axis='both', labelsize=14)
+axes[1].tick_params(axis='both', labelsize=14)
+plt.tight_layout()
+plt.subplots_adjust(hspace=0)
+plt.savefig('AIMD.png')

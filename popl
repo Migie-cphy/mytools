@@ -1,0 +1,49 @@
+#!/usr/local/Caskroom/miniconda/base/bin/python
+import sys
+import numpy
+import matplotlib.pyplot as plt
+
+# 记录高对称点文本   需要根据自己的高对称点来更改
+high_symmetry_point_str = ['$\Gamma$', '$X$', '$H_1$', '$C$', '$H$', '$Y$', '$\Gamma$']
+
+# 获取phono数据的路径
+data_file = sys.argv[1]
+
+X = []
+Y = []
+x = []
+y = []
+with open(data_file, 'r') as file:
+    reader = file.readlines()
+    high_symmetry_point = reader[2].split()
+    del high_symmetry_point[0]
+    high_symmetry_point = [float(i) for i in high_symmetry_point]  # 读取高对称点坐标
+    for row in reader[3:]:  # 读取声子谱数据
+        if not row.split():
+            X.append(numpy.array(x, dtype=float))
+            Y.append(numpy.array(y, dtype=float))
+            x = []
+            y = []
+        else:
+            x.append(float(row.split()[0]))
+            y.append(float(row.split()[1]))
+
+if x:  # 追加最后一条声子谱数据
+    X.append(numpy.array(x, dtype=float))
+    Y.append(numpy.array(y, dtype=float))
+
+fig, ax = plt.subplots(figsize=(12, 9), dpi=300)  # Create a figure and axis
+for i in range(len(X)):
+    ax.plot(X[i], Y[i], color='green', linewidth=2)
+for i in high_symmetry_point:  # 绘制高对称点虚线
+    ax.axvline(i, linestyle='-', color='black')
+
+ax.axhline(0, linestyle='--', color='black')  # 绘制y=0
+ax.set(xticks=[i for i in high_symmetry_point], xticklabels=high_symmetry_point_str)  # x轴标签
+ax.tick_params(axis='both', labelsize=20)
+ax.set_ylabel("Frequency (THz)", fontsize=20)  # 纵轴标题
+ax.set_xlim(high_symmetry_point[0], high_symmetry_point[-1])
+ax.set_ylim(-1, 10.5)
+
+# plt.show()  # Display the plot on the screen
+plt.savefig('phono.png')
